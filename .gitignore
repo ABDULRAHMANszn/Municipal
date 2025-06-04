@@ -1,0 +1,24 @@
+# PyCharm
+.idea/
+*.iml
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Database files
+*.sqlite3
+*.db
+
+data.db
+*.sqlite
+# تجاهل ملفات النظام
+*.DS_Store
+
+# تجاهل ملفات معينة
+images/con.png
