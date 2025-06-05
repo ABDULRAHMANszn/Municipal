@@ -208,3 +208,226 @@ def insert_suggestion(user_id, suggestion, category, proposed_solution, placehol
     """, (user_id, suggestion, category, proposed_solution, placeholder))
     conn.commit()
     conn.close()
+
+def create_water_subscription_table():
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS water_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            address TEXT,
+            property_type TEXT,
+            residents INTEGER,
+            usage TEXT,
+            has_tank TEXT,
+            tank_capacity TEXT,
+            notes TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+
+def create_water_subscription_table():
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS water_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            address TEXT,
+            property_type TEXT,
+            residents INTEGER,
+            usage TEXT,
+            has_tank TEXT,
+            tank_capacity TEXT,
+            notes TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def validate_water_subscription(data):
+    required = ['username', 'address', 'property_type', 'residents', 'usage', 'has_tank', 'notes']
+    missing = []
+    for field in required:
+        if not data.get(field) or str(data[field]).strip() == "":
+            missing.append(field)
+    if data.get('has_tank') == "Yes" and not data.get('tank_capacity'):
+        missing.append('tank_capacity')
+    return missing
+
+def save_water_subscription(data):
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO water_subscriptions 
+        (address, property_type, residents, usage, has_tank, tank_capacity, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        data['address'],
+        data['type'],
+        int(data['residents']),
+        data['usage'],
+        data['has_tank'],
+        data['tank_capacity'] if data['has_tank'] == "Yes" else "N/A",
+        data['notes']
+    ))
+    conn.commit()
+    conn.close()
+def create_electricity_subscription_table():
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS electricity_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            address TEXT,
+            property_type TEXT,
+            phase TEXT,
+            usage TEXT,
+            generator TEXT,
+            notes TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def save_electricity_subscription(data):
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO electricity_subscriptions 
+        (address, property_type, phase, usage, generator, notes)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        data['address'],
+        data['type'],
+        data['phase'],
+        data['usage'],
+        data['generator'],
+        data['notes']
+    ))
+    conn.commit()
+    conn.close()
+
+def validate_electricity_subscription(data):
+    required = ['address', 'type', 'phase', 'usage', 'generator']
+    missing = [field for field in required if not data.get(field)]
+    return missing
+
+def create_cleaning_subscription_table():
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS cleaning_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            address TEXT,
+            property_type TEXT,
+            frequency TEXT,
+            notes TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def save_cleaning_subscription(data):
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO cleaning_subscriptions (address, property_type, frequency, notes)
+        VALUES (?, ?, ?, ?)
+    """, (
+        data['address'],
+        data['property_type'],
+        data['frequency'],
+        data['notes']
+    ))
+    conn.commit()
+    conn.close()
+
+def create_gas_subscription_table():
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS gas_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            address TEXT,
+            property_type TEXT,
+            stove_type TEXT,
+            cylinder_size TEXT,
+            usage TEXT,
+            notes TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def save_gas_subscription(data):
+    conn = sqlite3.connect("municipal.db")
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO gas_subscriptions (address, property_type, stove_type, cylinder_size, usage, notes)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        data['address'],
+        data['property_type'],
+        data['stove_type'],
+        data['cylinder_size'],
+        data['usage'],
+        data['notes']
+    ))
+    conn.commit()
+    conn.close()
+def validate_gas_subscription(data):
+    required = ['address', 'property_type', 'stove_type', 'cylinder_size', 'usage']
+    missing = [field for field in required if not data.get(field)]
+    return missing
+
+def create_visa_subscription_table():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS visa_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            card_number TEXT,
+            current_balance TEXT,
+            topup_amount TEXT,
+            owner_name TEXT,
+            credit_card_number TEXT,
+            month TEXT,
+            year TEXT,
+            cvv TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+
+def save_visa_subscription(data):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO visa_subscriptions (
+            card_number, current_balance, topup_amount,
+            owner_name, credit_card_number, month, year, cvv
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        data['card_number'],
+        data['balance'],
+        data['topup'],
+        data['owner'],
+        data['credit_card'],
+        data['month'],
+        data['year'],
+        data['cvv']
+    ))
+    conn.commit()
+    conn.close()
+
+
+def validate_visa_subscription(data):
+    required_fields = ['card_number', 'topup', 'owner', 'credit_card', 'month', 'year', 'cvv']
+    missing = [field for field in required_fields if not data.get(field)]
+    return missing
+
