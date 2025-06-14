@@ -93,6 +93,7 @@ def create_tables():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS visa_subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
             card_number TEXT,
             current_balance TEXT,
             topup_amount TEXT,
@@ -107,6 +108,7 @@ def create_tables():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS gas_subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
             address TEXT,
             property_type TEXT,
             stove_type TEXT,
@@ -119,6 +121,7 @@ def create_tables():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS cleaning_subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
             address TEXT,
             property_type TEXT,
             frequency TEXT,
@@ -129,6 +132,7 @@ def create_tables():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS electricity_subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
             address TEXT,
             property_type TEXT,
             phase TEXT,
