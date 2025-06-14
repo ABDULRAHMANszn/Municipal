@@ -210,7 +210,7 @@ def insert_suggestion(user_id, suggestion, category, proposed_solution, placehol
     conn.close()
 
 def create_water_subscription_table():
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS water_subscriptions (
@@ -230,7 +230,7 @@ def create_water_subscription_table():
 
 
 def create_water_subscription_table():
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS water_subscriptions (
@@ -259,7 +259,7 @@ def validate_water_subscription(data):
     return missing
 
 def save_water_subscription(data):
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO water_subscriptions 
@@ -277,7 +277,7 @@ def save_water_subscription(data):
     conn.commit()
     conn.close()
 def create_electricity_subscription_table():
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS electricity_subscriptions (
@@ -294,7 +294,7 @@ def create_electricity_subscription_table():
     conn.close()
 
 def save_electricity_subscription(data):
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO electricity_subscriptions 
@@ -317,7 +317,7 @@ def validate_electricity_subscription(data):
     return missing
 
 def create_cleaning_subscription_table():
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS cleaning_subscriptions (
@@ -332,7 +332,7 @@ def create_cleaning_subscription_table():
     conn.close()
 
 def save_cleaning_subscription(data):
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO cleaning_subscriptions (address, property_type, frequency, notes)
@@ -347,7 +347,7 @@ def save_cleaning_subscription(data):
     conn.close()
 
 def create_gas_subscription_table():
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS gas_subscriptions (
@@ -364,7 +364,7 @@ def create_gas_subscription_table():
     conn.close()
 
 def save_gas_subscription(data):
-    conn = sqlite3.connect("municipal.db")
+    conn = sqlite3.connect("data.db")
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO gas_subscriptions (address, property_type, stove_type, cylinder_size, usage, notes)
