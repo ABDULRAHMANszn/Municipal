@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QMessageBox
 
 from Signup import SignUpWindow
 from Login import logIn
-from log_employee import LogInWindow
-
+from employee.log_employee import LogInWindow
+from db_manager import create_tables
 
 class WelcomeWindow(QMainWindow):
     def __init__(self):
@@ -107,6 +107,7 @@ class WelcomeWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    create_tables()
     welcome = WelcomeWindow()
     welcome.show()
     sys.exit(app.exec_())

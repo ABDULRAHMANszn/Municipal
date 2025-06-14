@@ -10,12 +10,12 @@ from user.service import Service
 from profile import Profile
 import sys
 from db_manager import *
-from subsucribtion_panels import *
+
 
 
 class Main(QWidget):
-    def __init__(self, username):
-        super().__init__()
+    def _init_(self, username):
+        super()._init_()
         self.username = username
 
         self.subl = QLabel("Subscriptions", self)
@@ -24,18 +24,13 @@ class Main(QWidget):
         self.subl.setGeometry(320, 45, 300, 60)
         self.subl.setStyleSheet("color: #1E2A38;")
 
-        self.water_form = WaterSubscriptionForm(self.username)
-        self.electricity_form = ElectricitySubscriptionForm(self.username)
-        self.cleaning_form = CleaningSubscriptionForm(self.username)
-        self.gas_form = GasSubscriptionForm(self.username)
-        self.visa_form = VisaDigitalForm(self.username)
 
-        self.create_fun_card(90, 130, "../images/Su.jpeg", "Water Subscription", "Subscribe", self.show_water_form)
-        self.create_fun_card(340, 130, "../images/elec.jpg", "Electricity Subscription", "Subscribe", self.show_electricity_form)
-        self.create_fun_card(590, 130, "../images/clean.jpg", "Cleaning Subscription", "Subscribe", self.show_cleaning_form)
-        self.create_fun_card(90, 420, "../images/gas.jpg", "Gas Subscription", "Subscribe", self.show_gas_form)
-        self.create_fun_card(340, 420, "../images/visa.jpg", "Visa Digital", "Subscribe", self.show_visa_form)
-        self.create_fun_card(590, 420, "../images/statf.jpeg", "Staff", "View")
+
+        self.create_fun_card(90, 130, "../images/Su.jpeg", "Water Subscription", "Add Bill", self.show_water_form)
+        self.create_fun_card(340, 130, "../images/elec.jpg", "Electricity Subscription", "Add Bill", self.show_electricity_form)
+        self.create_fun_card(590, 130, "../images/clean.jpg", "Cleaning Subscription", "Add Bill", self.show_cleaning_form)
+        self.create_fun_card(340, 420, "../images/gas.jpg", "Gas Subscription", "Add Bill", self.show_gas_form)
+
 
     def create_fun_card(self, x, y, image_path, title_text, button_text, button_action=None):
         card = QFrame(self)
@@ -100,8 +95,8 @@ class Main(QWidget):
 
 
 class Dashboard(QMainWindow):
-    def __init__(self, username):
-        super().__init__()
+    def _init_(self, username):
+        super()._init_()
         self.username = username
 
         self.setFixedSize(1244, 700)
@@ -157,7 +152,7 @@ class Dashboard(QMainWindow):
         self.btn_main.setIcon(QIcon("../images/home.png"))
         self.btn_main.setIconSize(QSize(20, 20))
 
-        self.btn_Subsc = QPushButton(" My Subscriptions", self.left_frame)
+        self.btn_Subsc = QPushButton(" All Users", self.left_frame)
         self.btn_Subsc.setGeometry(0, 300, 350, 50)
         self.btn_Subsc.setCheckable(True)
         self.btn_Subsc.setStyleSheet(button_style)
@@ -175,7 +170,7 @@ class Dashboard(QMainWindow):
         self.btn_complaint.setGeometry(0, 400, 350, 50)
         self.btn_complaint.setCheckable(True)
         self.btn_complaint.setStyleSheet(button_style)
-        self.btn_complaint.setIcon(QIcon("../images/cons.png"))
+        self.btn_complaint.setIcon(QIcon("../images/con.png"))
         self.btn_complaint.setIconSize(QSize(22, 22))
 
         self.btn_suggestion = QPushButton(" Suggestion", self.left_frame)
@@ -245,7 +240,7 @@ class Dashboard(QMainWindow):
             btn.setChecked(btn == active_button)
 
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     create_tables()
 
     app = QApplication(sys.argv)
