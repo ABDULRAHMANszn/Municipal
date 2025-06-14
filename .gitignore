@@ -13,7 +13,6 @@ venv/
 
 # Database files
 *.sqlite3
-*.db
 
 data.db
 *.sqlite
