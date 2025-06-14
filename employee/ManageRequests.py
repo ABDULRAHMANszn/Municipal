@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QComboBox, QMessageBox
 from PyQt5.QtCore import Qt
+from functools import partial
 from db_manager import get_all_user_requests_info, update_request_status
 
 
@@ -32,7 +33,7 @@ class ManageRequests(QWidget):
             combo.setCurrentText(status)
 
             if request_id:
-                combo.currentTextChanged.connect(lambda new_status, req_id=request_id: self.update_status(req_id, new_status))
+                combo.currentTextChanged.connect(partial(self.update_status, request_id))
             else:
                 combo.setEnabled(False)
 

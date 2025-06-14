@@ -4,9 +4,9 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QMessageBox
 
 from user.Signup import SignUpWindow
-from user.Login import logIn
+
 from employee.log_employee import LogInWindow
-from db_manager import create_tables, create_employee_table  # ✅ تمت إضافة create_employee_table
+from db_manager import create_tables, create_employee_table
 
 
 class WelcomeWindow(QMainWindow):
@@ -14,7 +14,7 @@ class WelcomeWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Welcome Page")
         self.setFixedSize(1244, 700)
-        self.move(350, 200)
+        self.move(350, 150)
         self.setWindowIcon(QIcon("../images/icon.png"))
 
         self.signup_window = None
@@ -91,6 +91,7 @@ class WelcomeWindow(QMainWindow):
         QMessageBox.about(self, "Municipal Services Tracking", information)
 
     def open_login(self):
+        from user.Login import logIn  # 👈 ننقل الاستيراد هنا
         self.login_window = logIn()
         self.login_window.show()
         self.close()
@@ -108,11 +109,8 @@ class WelcomeWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-
-    # ✅ إنشاء الجداول الأساسية + جدول الموظفين + حساب admin
     create_tables()
     create_employee_table()
-
     welcome = WelcomeWindow()
     welcome.show()
     sys.exit(app.exec_())

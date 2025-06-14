@@ -87,14 +87,6 @@ class logIn(QMainWindow):
         self.close()
 
     def open_dashboard(self, fusername):
-        print("koniidsfsdf")
         self.dashboard_window = Dashboard(fusername)
         self.dashboard_window.show()
         self.close()
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = logIn()
-    window.show()
-    sys.exit(app.exec_())

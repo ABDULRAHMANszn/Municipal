@@ -11,6 +11,8 @@ from profile import Profile
 import sys
 from db_manager import *
 from subsucribtion_panels import *
+from my_sub import UserSubscriptions
+from welcome import WelcomeWindow
 
 
 class Main(QWidget):
@@ -31,11 +33,13 @@ class Main(QWidget):
         self.visa_form = VisaDigitalForm(self.username)
 
         self.create_fun_card(90, 130, "../images/Su.jpeg", "Water Subscription", "Subscribe", self.show_water_form)
-        self.create_fun_card(340, 130, "../images/elec.jpg", "Electricity Subscription", "Subscribe", self.show_electricity_form)
-        self.create_fun_card(590, 130, "../images/clean.jpg", "Cleaning Subscription", "Subscribe", self.show_cleaning_form)
+        self.create_fun_card(340, 130, "../images/elec.jpg", "Electricity Subscription", "Subscribe",
+                             self.show_electricity_form)
+        self.create_fun_card(590, 130, "../images/clean.jpg", "Cleaning Subscription", "Subscribe",
+                             self.show_cleaning_form)
         self.create_fun_card(90, 420, "../images/gas.jpg", "Gas Subscription", "Subscribe", self.show_gas_form)
         self.create_fun_card(340, 420, "../images/visa.jpg", "Visa Digital", "Subscribe", self.show_visa_form)
-        self.create_fun_card(590, 420, "../images/statf.jpeg", "Staff", "View")
+        self.create_fun_card(590, 420, "../images/statf.jpeg", "Staff", "View", self.view)
 
     def create_fun_card(self, x, y, image_path, title_text, button_text, button_action=None):
         card = QFrame(self)
@@ -97,6 +101,14 @@ class Main(QWidget):
     def show_visa_form(self):
         self.visa_form.raise_()
         self.visa_form.setVisible(True)
+
+    def view(self):
+        information = '''
+                <h2 style="color:#196297; text-align:center;">The Staff</h2>
+                <p style="font-size:14px; color:#333333; text-align:justify;">
+        The individuals who completed this project are Saed O. S. Radi, Abdulrahman Zeineddin, and Kinan Al-Imam. </p>'''
+
+        QMessageBox.about(self, "Municipal Services Tracking", information)
 
 
 class Dashboard(QMainWindow):
@@ -199,19 +211,16 @@ class Dashboard(QMainWindow):
         self.btn_signout.setIcon(QIcon("../images/out.png"))
         self.btn_signout.setIconSize(QSize(22, 22))
 
-        def open_welcome():
-            from welcome import WelcomeWindow
-            self.welcome_window = WelcomeWindow()
-            self.welcome_window.show()
-            self.close()
-
-        self.btn_signout.clicked.connect(open_welcome)
+        self.btn_signout.clicked.connect(self.open_welcome)
 
         self.stack = QStackedWidget(self.right_frame)
         self.stack.setGeometry(0, 0, 894, 700)
 
         self.page_main = Main(self.username)
-        self.page_subs = Main(self.username)
+        self.page_subs = UserSubscriptions(self.username)
+        self.page_subs.table.clear()
+
+        self.page_subs.load_data()
         self.page_service = Service(self.username)
         self.page_complaint = Complainment(self.username)
         self.page_suggestion = Suggestion(self.username)
@@ -244,11 +253,8 @@ class Dashboard(QMainWindow):
         ]:
             btn.setChecked(btn == active_button)
 
+    def open_welcome(self):
+        self.welcome_window = WelcomeWindow()
+        self.welcome_window.show()
+        self.close()
 
-if __name__ == "__main__":
-    create_tables()
-
-    app = QApplication(sys.argv)
-    window = Dashboard("user")
-    window.show()
-    sys.exit(app.exec_())

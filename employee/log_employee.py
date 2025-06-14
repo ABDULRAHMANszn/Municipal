@@ -69,7 +69,6 @@ class LogInWindow(QMainWindow):
         if check_employee_credentials(username, password):
             QMessageBox.information(self, "Login Successful", f"Welcome, {username}!")
 
-            # ✅ فتح لوحة تحكم الموظف وتمرير اسم المستخدم
             self.dashboard = Dashboard(username)
             self.dashboard.show()
             self.close()
@@ -77,10 +76,3 @@ class LogInWindow(QMainWindow):
         else:
             QMessageBox.critical(self, "Login Failed", "Invalid username or password.")
 
-
-if __name__ == "__main__":
-    create_employee_table()  # ✅ إنشاء جدول الموظف وإضافة admin إن لم يكن موجود
-    app = QApplication(sys.argv)
-    window = LogInWindow()
-    window.show()
-    sys.exit(app.exec_())

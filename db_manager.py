@@ -1,5 +1,6 @@
 import sqlite3
 import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "data.db")
 
@@ -8,9 +9,10 @@ def create_tables():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("PRAGMA foreign_keys = ON;")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             name TEXT NOT NULL,
             surname TEXT NOT NULL,
@@ -72,6 +74,7 @@ def create_tables():
             contact TEXT,
             description TEXT,
             complaint_type TEXT,
+            status TEXT DEFAULT 'pending',
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
@@ -85,6 +88,7 @@ def create_tables():
             category TEXT,
             proposed_solution TEXT,
             placeholder TEXT,
+            status TEXT DEFAULT 'pending',
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id)
         )
@@ -170,10 +174,37 @@ def get_user_id(username):
     return result[0] if result else None
 
 
-def get_all_usernames():
+def get_all_userW():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT username FROM users")
+    cursor.execute("SELECT username FROM water_subscriptions")
+    results = cursor.fetchall()
+    conn.close()
+    return [row[0] for row in results]
+
+
+def get_all_userC():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM cleaning_subscriptions")
+    results = cursor.fetchall()
+    conn.close()
+    return [row[0] for row in results]
+
+
+def get_all_userE():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM electricity_subscriptions")
+    results = cursor.fetchall()
+    conn.close()
+    return [row[0] for row in results]
+
+
+def get_all_userG():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM gas_subscriptions")
     results = cursor.fetchall()
     conn.close()
     return [row[0] for row in results]
@@ -276,17 +307,6 @@ def insert_suggestion(user_id, suggestion, category, proposed_solution, placehol
     conn.close()
 
 
-def validate_water_subscription(data):
-    required = ['username', 'address', 'property_type', 'residents', 'usage', 'has_tank', 'notes']
-    missing = []
-    for field in required:
-        if not data.get(field) or str(data[field]).strip() == "":
-            missing.append(field)
-    if data.get('has_tank') == "Yes" and not data.get('tank_capacity'):
-        missing.append('tank_capacity')
-    return missing
-
-
 def save_water_subscription(data):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -313,9 +333,10 @@ def save_electricity_subscription(data):
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO electricity_subscriptions 
-        (address, property_type, phase, usage, generator, notes)
-        VALUES (?, ?, ?, ?, ?, ?)
+        (username, address, property_type, phase, usage, generator, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
+        data['username'],
         data['address'],
         data['type'],
         data['phase'],
@@ -327,19 +348,15 @@ def save_electricity_subscription(data):
     conn.close()
 
 
-def validate_electricity_subscription(data):
-    required = ['address', 'type', 'phase', 'usage', 'generator']
-    missing = [field for field in required if not data.get(field)]
-    return missing
-
-
 def save_cleaning_subscription(data):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
-        INSERT INTO cleaning_subscriptions (address, property_type, frequency, notes)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO cleaning_subscriptions 
+        (username, address, property_type, frequency, notes)
+        VALUES (?, ?, ?, ?, ?)
     """, (
+        data['username'],
         data['address'],
         data['property_type'],
         data['frequency'],
@@ -353,9 +370,11 @@ def save_gas_subscription(data):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
-        INSERT INTO gas_subscriptions (address, property_type, stove_type, cylinder_size, usage, notes)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO gas_subscriptions 
+        (username, address, property_type, stove_type, cylinder_size, usage, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
+        data['username'],
         data['address'],
         data['property_type'],
         data['stove_type'],
@@ -367,21 +386,16 @@ def save_gas_subscription(data):
     conn.close()
 
 
-def validate_gas_subscription(data):
-    required = ['address', 'property_type', 'stove_type', 'cylinder_size', 'usage']
-    missing = [field for field in required if not data.get(field)]
-    return missing
-
-
 def save_visa_subscription(data):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO visa_subscriptions (
-            card_number, current_balance, topup_amount,
+            username, card_number, current_balance, topup_amount,
             owner_name, credit_card_number, month, year, cvv
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
+        data['username'],
         data['card_number'],
         data['balance'],
         data['topup'],
@@ -395,59 +409,114 @@ def save_visa_subscription(data):
     conn.close()
 
 
-def validate_visa_subscription(data):
-    required_fields = ['card_number', 'topup', 'owner', 'credit_card', 'month', 'year', 'cvv']
-    missing = [field for field in required_fields if not data.get(field)]
-    return missing
-
-def get_user_id(username):
+def fetch_user_subscriptions(username):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] if result else None
 
-def create_default_bills_for_new_user(conn, user_id):
-    cursor = conn.cursor()
-    service_prices = {
-        "Water": 25.0,
-        "Electricity": 50.0,
-        "Sanitation": 10.0,
-        "Street Lighting": 8.0
+    subscriptions = {
+        "gas_subscriptions": ["address", "property_type", "usage"],
+        "cleaning_subscriptions": ["address", "property_type", "frequency"],
+        "electricity_subscriptions": ["address", "property_type", "usage"],
+        "water_subscriptions": ["address", "property_type", "residents", "usage"],
     }
 
-    for service, amount in service_prices.items():
-        cursor.execute("""
-            INSERT INTO bills (user_id, service, amount, status)
-            VALUES (?, ?, ?, 'unpaid')
-        """, (user_id, service, amount))
+    all_rows = []
+    for table, fields in subscriptions.items():
+        try:
+            fields_str = ", ".join(fields)
+            query = f"SELECT '{table}', {fields_str} FROM {table} WHERE username = ?"
+            cursor.execute(query, (username,))
+            rows = cursor.fetchall()
+            all_rows.extend(rows)
+        except Exception as e:
+            print(f"Error loading from {table}: {e}")
 
-    conn.commit()
+    conn.close()
+    return all_rows
 
 
-def create_employee_table():
+def get_all_users():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT id, username, name, surname, password FROM users")
+    users = c.fetchall()
+    conn.close()
+    return users
+
+
+def update_user(user_id, name, surname, password):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        CREATE TABLE IF NOT EXISTS employee (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    """)
-    c.execute("SELECT * FROM employee WHERE username = ?", ("admin",))
-    if not c.fetchone():
-        c.execute("INSERT INTO employee (username, password) VALUES (?, ?)", ("admin", "admin"))
-        print("Default admin user created.")
+        UPDATE users
+        SET name = ?, surname = ?, password = ?
+        WHERE id = ?
+    """, (name, surname, password, user_id))
     conn.commit()
     conn.close()
 
 
+def delete_user_by_id(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
 
 
+def get_all_user_requests_info():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, username FROM users")
+    users = cursor.fetchall()
+
+    result = []
+
+    for user_id, username in users:
+        # complaint
+        cursor.execute("SELECT description FROM complaints WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        complaint = cursor.fetchone()
+        complaint_text = complaint[0] if complaint else ""
+
+        # request
+        cursor.execute("SELECT description, status, id FROM requests WHERE user_id = ? ORDER BY id DESC LIMIT 1",
+                       (user_id,))
+        request = cursor.fetchone()
+        request_text = request[0] if request else ""
+        request_status = request[1] if request else "Pending"
+        request_id = request[2] if request else None
+
+        # suggestion
+        cursor.execute("SELECT suggestion FROM suggestions WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        suggestion = cursor.fetchone()
+        suggestion_text = suggestion[0] if suggestion else ""
+
+        result.append((username, complaint_text, request_text, suggestion_text, request_id, request_status))
+
+    conn.close()
+    return result
 
 
+def update_request_status(request_id, new_status):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE requests SET status = ? WHERE id = ?", (new_status, request_id))
+    conn.commit()
+    conn.close()
+
+
+def fetch_unpaid_bills(username):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+            SELECT type, month, consumption, amount, status
+            FROM bills
+            WHERE username = ? AND status = 'unpaid'
+        """, (username,))
+    results = cursor.fetchall()
+    conn.close()
+    return results
 
 
 def register_user(username, name, surname, password, confirm_password):
@@ -484,23 +553,6 @@ def register_user(username, name, surname, password, confirm_password):
         if conn:
             conn.close()
 
-def create_default_bills_for_new_user(conn, user_id):
-    cursor = conn.cursor()
-    service_prices = {
-        "Water": 25.0,
-        "Electricity": 50.0,
-        "Sanitation": 10.0,
-        "Street Lighting": 8.0
-    }
-
-    for service, amount in service_prices.items():
-        cursor.execute("""
-            INSERT INTO bills (user_id, service, amount, status)
-            VALUES (?, ?, ?, 'unpaid')
-        """, (user_id, service, amount))
-
-    conn.commit()
-
 
 def check_credentials(username, password):
     try:
@@ -520,6 +572,24 @@ def check_credentials(username, password):
         conn.close()
 
 
+def create_employee_table():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS employee (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    """)
+    c.execute("SELECT * FROM employee WHERE username = ?", ("admin",))
+    if not c.fetchone():
+        c.execute("INSERT INTO employee (username, password) VALUES (?, ?)", ("admin", "admin"))
+        print("Default admin user created.")
+    conn.commit()
+    conn.close()
+
+
 def check_employee_credentials(username, password):
     try:
         conn = sqlite3.connect(DB_PATH)
@@ -533,70 +603,36 @@ def check_employee_credentials(username, password):
         conn.close()
 
 
-def get_all_users():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT id, username, name, surname, password FROM users")
-    users = c.fetchall()
-    conn.close()
-    return users
-
-
-def update_user(user_id, name, surname, password):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("""
-        UPDATE users
-        SET name = ?, surname = ?, password = ?
-        WHERE id = ?
-    """, (name, surname, password, user_id))
-    conn.commit()
-    conn.close()
-
-
-def delete_user_by_id(user_id):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("DELETE FROM users WHERE id = ?", (user_id,))
-    conn.commit()
-    conn.close()
-
-def get_all_user_requests_info():
+def user_has_visa(username):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-
-    cursor.execute("SELECT id, username FROM users")
-    users = cursor.fetchall()
-
-    result = []
-
-    for user_id, username in users:
-        # complaint
-        cursor.execute("SELECT description FROM complaints WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
-        complaint = cursor.fetchone()
-        complaint_text = complaint[0] if complaint else ""
-
-        # request
-        cursor.execute("SELECT description, status, id FROM requests WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
-        request = cursor.fetchone()
-        request_text = request[0] if request else ""
-        request_status = request[1] if request else "Pending"
-        request_id = request[2] if request else None
-
-        # suggestion
-        cursor.execute("SELECT suggestion FROM suggestions WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
-        suggestion = cursor.fetchone()
-        suggestion_text = suggestion[0] if suggestion else ""
-
-        result.append((username, complaint_text, request_text, suggestion_text, request_id, request_status))
-
+    cursor.execute("""
+        SELECT COUNT(*) FROM visa_subscriptions WHERE username = ?
+    """, (username,))
+    result = cursor.fetchone()[0]
     conn.close()
-    return result
+    return result > 0  # يرجع True إذا عنده بطاقة
 
 
-def update_request_status(request_id, new_status):
+def mark_bill_as_paid(username, service, month):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE requests SET status = ? WHERE id = ?", (new_status, request_id))
+    cursor.execute("""
+        UPDATE bills 
+        SET status = 'paid' 
+        WHERE username = ? AND type = ? AND month = ? AND status = 'unpaid'
+    """, (username, service, month))
     conn.commit()
     conn.close()
+
+
+def get_user_visa(username):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT card_number, owner_name FROM visa_subscriptions WHERE username = ?
+        ORDER BY id DESC LIMIT 1
+    """, (username,))
+    result = cursor.fetchone()
+    conn.close()
+    return result  # إما (card_number, owner_name) أو None

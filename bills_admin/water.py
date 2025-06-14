@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QApplication
 from PyQt5.QtGui import QFont
-from db_manager import get_user_id, add_water_bill, create_tables, get_all_usernames
+from db_manager import get_user_id, add_water_bill, create_tables, get_all_userW
 
 
 class AdminPanel(QWidget):
@@ -25,7 +25,7 @@ class AdminPanel(QWidget):
         self.users = QComboBox(self)
         self.users.setGeometry(190, 25, 250, 50)
         self.users.setFont(QFont("Segoe UI", 12))
-        self.users.addItems(get_all_usernames())
+        self.users.addItems(get_all_userW())
         self.users.setStyleSheet("background-color: white;")
 
         # Month Label

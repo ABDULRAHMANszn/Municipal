@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QApplication
 from PyQt5.QtGui import QFont
-from db_manager import get_user_id, add_gas_bill, create_tables, get_all_usernames
+from db_manager import get_user_id, add_gas_bill, create_tables, get_all_userG
 
 
 class GasBillPanel(QWidget):
@@ -25,7 +25,7 @@ class GasBillPanel(QWidget):
         self.user_input.setGeometry(190, 25, 250, 50)
         self.user_input.setFont(QFont("Segoe UI", 12))
         self.user_input.setStyleSheet("background-color: white;")
-        self.user_input.addItems(get_all_usernames())
+        self.user_input.addItems(get_all_userG())
 
         # Month
         self.month_label = QLabel("Month:", self)

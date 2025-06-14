@@ -6,13 +6,15 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
 from db_manager import *
+from my_sub import UserSubscriptions
 
 
 class WaterSubscriptionForm(QFrame):
     def __init__(self, username):
         super().__init__()
         self.username = username
-        self.setGeometry(120, 100, 650, 420)
+
+        self.setGeometry(780, 280, 650, 420)
         self.setStyleSheet("""
             QFrame { background-color:#f1f2f6; border-radius: 15px; }
             QLabel { font-size: 14px; }
@@ -96,15 +98,17 @@ class WaterSubscriptionForm(QFrame):
             save_water_subscription(data)
             QMessageBox.information(self, "Success", "Subscription saved successfully.")
             self.hide()
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save:\n{str(e)}")
 
 
 class ElectricitySubscriptionForm(QFrame):
-    def __init__(self, username, parent=None):
-        super().__init__(parent)
+    def __init__(self, username):
+        super().__init__()
         self.username = username
-        self.setGeometry(120, 100, 650, 400)
+
+        self.setGeometry(780, 280, 650, 420)
         self.setStyleSheet("""
             QFrame { background-color:#f1f2f6; border-radius: 15px; }
             QLabel { font-size: 14px; }
@@ -142,6 +146,7 @@ class ElectricitySubscriptionForm(QFrame):
         self.btn_submit.setStyleSheet("background-color: #196297; color: white; padding: 8px; border-radius: 5px;")
         self.btn_cancel.setStyleSheet("background-color: #ccc; padding: 8px; border-radius: 5px;")
         self.btn_submit.clicked.connect(self.submit_form)
+
         self.btn_cancel.clicked.connect(self.hide)
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_submit)
@@ -164,14 +169,14 @@ class ElectricitySubscriptionForm(QFrame):
 
         data["username"] = self.username
 
-        missing = [key for key in data if key != 'notes' and not data[key]]
+        missing = []
 
         if missing:
             QMessageBox.warning(self, "Missing Data", "Please fill in all required fields.")
             return
 
         try:
-            save_electricity_subscription(data)  # ← افترض أن لديك هذا الفنكشن
+            save_electricity_subscription(data)
             QMessageBox.information(self, "Success", "Electricity subscription submitted successfully.")
             self.hide()
         except Exception as e:
@@ -179,10 +184,11 @@ class ElectricitySubscriptionForm(QFrame):
 
 
 class CleaningSubscriptionForm(QFrame):
-    def __init__(self, username, parent=None):
-        super().__init__(parent)
+    def __init__(self, username):
+        super().__init__()
         self.username = username
-        self.setGeometry(120, 100, 650, 350)
+        self.setGeometry(780, 280, 650, 320)
+
         self.setStyleSheet("""
             QFrame { background-color:#f1f2f6; border-radius: 15px; }
             QLabel { font-size: 14px; }
@@ -216,6 +222,7 @@ class CleaningSubscriptionForm(QFrame):
         self.btn_submit.setStyleSheet("background-color: #196297; color: white; padding: 8px; border-radius: 5px;")
         self.btn_cancel.setStyleSheet("background-color: #ccc; padding: 8px; border-radius: 5px;")
         self.btn_submit.clicked.connect(self.submit_form)
+
         self.btn_cancel.clicked.connect(self.hide)
 
         btn_layout.addStretch()
@@ -249,15 +256,17 @@ class CleaningSubscriptionForm(QFrame):
             save_cleaning_subscription(data)
             QMessageBox.information(self, "Success", "Cleaning subscription submitted successfully.")
             self.hide()
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save:\n{str(e)}")
 
 
 class GasSubscriptionForm(QFrame):
-    def __init__(self, username, parent=None):
-        super().__init__(parent)
+    def __init__(self, username):
+        super().__init__()
         self.username = username
-        self.setGeometry(120, 100, 650, 400)
+        self.setGeometry(780, 280, 650, 400)
+
         self.setStyleSheet("""
             QFrame { background-color:#f1f2f6; border-radius: 15px; }
             QLabel { font-size: 14px; }
@@ -296,6 +305,7 @@ class GasSubscriptionForm(QFrame):
         self.btn_submit.setStyleSheet("background-color: #196297; color: white; padding: 8px; border-radius: 5px;")
         self.btn_cancel.setStyleSheet("background-color: #ccc; padding: 8px; border-radius: 5px;")
         self.btn_submit.clicked.connect(self.submit_form)
+
         self.btn_cancel.clicked.connect(self.hide)
 
         btn_layout.addStretch()
@@ -330,15 +340,17 @@ class GasSubscriptionForm(QFrame):
             save_gas_subscription(data)
             QMessageBox.information(self, "Success", "Gas subscription submitted successfully.")
             self.hide()
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save:\n{str(e)}")
 
 
 class VisaDigitalForm(QFrame):
-    def __init__(self, username, parent=None):
-        super().__init__(parent)
+    def __init__(self, username):
+        super().__init__()
         self.username = username
-        self.setGeometry(120, 100, 650, 400)
+        self.setGeometry(780, 280, 650, 400)
+
         self.setStyleSheet("""
             QFrame {
                 background-color:#f1f2f6;
@@ -370,7 +382,7 @@ class VisaDigitalForm(QFrame):
         self.inputs['balance'] = QLineEdit("₺0,00")
         self.inputs['balance'].setReadOnly(True)
         self.inputs['topup'] = QLineEdit()
-        form_layout.addRow("Transportation Card Number:", self.inputs['card_number'])
+        form_layout.addRow("Municipal Card Number:", self.inputs['card_number'])
         form_layout.addRow("Current Balance:", self.inputs['balance'])
         form_layout.addRow("Balance to be loaded:", self.inputs['topup'])
 
@@ -404,6 +416,7 @@ class VisaDigitalForm(QFrame):
         cancel_btn = QPushButton("Cancel")
         cancel_btn.setStyleSheet("padding: 6px;")
         submit_btn.clicked.connect(self.submit_form)
+
         cancel_btn.clicked.connect(self.hide)
         btn_layout.addStretch()
         btn_layout.addWidget(submit_btn)
@@ -432,5 +445,6 @@ class VisaDigitalForm(QFrame):
             save_visa_subscription(data)
             QMessageBox.information(self, "Successful", "Payment completed successfully.")
             self.hide()
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Database error:\n{str(e)}")

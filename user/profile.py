@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QLineEdit, QPushButton, QComboBox,
-    QGroupBox, QRadioButton, QDateEdit
+    QGroupBox, QRadioButton, QDateEdit, QMessageBox
 )
 from PyQt5.QtGui import QFont, QIcon
 from db_manager import save_profile,  create_tables,get_user_id
@@ -35,10 +35,10 @@ class Profile(QWidget):
         self.create_label("TC kimlik:", 320, 200)
         self.create_label("City:", 320, 300)
         self.create_label("Sex:", 320, 400)
-
-        self.create_label("Old password: *", 600, 100)
-        self.create_label("New password: *", 600, 200)
-        self.create_label("Confirm new password: *", 600, 300)
+        #
+        # self.create_label("Father name: ", 600, 100)
+        # self.create_label("Mother nmae: ", 600, 200)
+        # self.create_label("Marital Status:", 600, 300)
         self.create_label("Birthday:", 600, 400)
 
         # Inputs
@@ -75,18 +75,18 @@ class Profile(QWidget):
         self.sex_female.move(70, 0)
         self.sex_male.setChecked(True)
 
-        # Passwords
-        self.input_oldpass = QLineEdit(self)
-        self.input_oldpass.setGeometry(600, 150, 200, 30)
-        self.input_oldpass.setEchoMode(QLineEdit.Password)
-
-        self.input_newpass = QLineEdit(self)
-        self.input_newpass.setGeometry(600, 250, 200, 30)
-        self.input_newpass.setEchoMode(QLineEdit.Password)
-
-        self.input_confirmpass = QLineEdit(self)
-        self.input_confirmpass.setGeometry(600, 350, 200, 30)
-        self.input_confirmpass.setEchoMode(QLineEdit.Password)
+        # # Passwords
+        # self.input_oldpass = QLineEdit(self)
+        # self.input_oldpass.setGeometry(600, 150, 200, 30)
+        # self.input_oldpass.setEchoMode(QLineEdit.Password)
+        #
+        # self.input_newpass = QLineEdit(self)
+        # self.input_newpass.setGeometry(600, 250, 200, 30)
+        # self.input_newpass.setEchoMode(QLineEdit.Password)
+        #
+        # self.input_confirmpass = QLineEdit(self)
+        # self.input_confirmpass.setGeometry(600, 350, 200, 30)
+        # self.input_confirmpass.setEchoMode(QLineEdit.Password)
 
         # Birthday
         self.input_birthday = QDateEdit(self)
@@ -118,34 +118,33 @@ class Profile(QWidget):
         label.move(x, y)
         return label
 
+    from PyQt5.QtWidgets import QMessageBox
+
     def save_data(self):
-        sex = "Male" if self.sex_male.isChecked() else "Female"
-        birthday = self.input_birthday.date().toString("yyyy-MM-dd")
+        try:
+            sex = "Male" if self.sex_male.isChecked() else "Female"
+            birthday = self.input_birthday.date().toString("yyyy-MM-dd")
 
-        user_id = get_user_id(self.input_username)
+            user_id = get_user_id(self.input_username.text())
 
-        if user_id is None:
-            print("User ID not found.")
-            return
+            if user_id is None:
+                QMessageBox.warning(self, "Error", "User not found.")
+                return
 
-        data = (
-            user_id,
-            self.input_firstname.text(),
-            self.input_lastname.text(),
-            self.input_email.text(),
-            self.input_phone.text(),
-            self.input_tc.text(),
-            self.input_city.currentText(),
-            sex,
-            birthday
-        )
-        save_profile(data)
+            data = (
+                user_id,
+                self.input_firstname.text(),
+                self.input_lastname.text(),
+                self.input_email.text(),
+                self.input_phone.text(),
+                self.input_tc.text(),
+                self.input_city.currentText(),
+                sex,
+                birthday
+            )
+            save_profile(data)
 
-        print("Profile saved successfully.")
+            QMessageBox.information(self, "Success", "Profile saved successfully!")
 
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = Profile("Abood")
-    window.show()
-    sys.exit(app.exec_())
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"An error occurred while saving:\n{e}")

@@ -4,8 +4,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import Qt
-from db_manager import register_user  # هذا يمكن تركه لأنه لا يستورد شيء من welcome أو login
-
+from db_manager import register_user
 
 class SignUpWindow(QMainWindow):
 
@@ -99,14 +98,8 @@ class SignUpWindow(QMainWindow):
             QMessageBox.warning(self, "Registration Error", msg)
 
     def login_btn_clicked(self):
-        from Login import logIn  # ✅ استيراد متأخر لمنع الاستيراد الدائري
+        from Login import logIn
         self.main_window = logIn()
         self.main_window.show()
         self.close()
 
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = SignUpWindow()
-    window.show()
-    sys.exit(app.exec_())
