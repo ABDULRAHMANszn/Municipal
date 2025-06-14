@@ -1,5 +1,4 @@
 import sys
-
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QApplication
 from PyQt5.QtGui import QFont
 from db_manager import get_user_id, add_water_bill, create_tables, get_all_usernames
