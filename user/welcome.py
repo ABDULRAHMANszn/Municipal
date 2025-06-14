@@ -3,10 +3,11 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QMessageBox
 
-from Signup import SignUpWindow
-from Login import logIn
+from user.Signup import SignUpWindow
+from user.Login import logIn
 from employee.log_employee import LogInWindow
-from db_manager import create_tables
+from db_manager import create_tables, create_employee_table  # ✅ تمت إضافة create_employee_table
+
 
 class WelcomeWindow(QMainWindow):
     def __init__(self):
@@ -33,41 +34,41 @@ class WelcomeWindow(QMainWindow):
         # Welcome Label
         welcome_text = '''<b>WELCOME</b><i>to our App</i>'''
         self.welcome_label = QLabel(welcome_text, self)
-        self.welcome_label.setGeometry(500,200,600,60)
+        self.welcome_label.setGeometry(500, 200, 600, 60)
         self.welcome_label.setStyleSheet('color: #196297; font-size: 55px;')
 
         # Info Button
         self.info_button = QPushButton("Info", self)
         self.info_button.setGeometry(610, 290, 100, 50)
-        self.info_button.setStyleSheet('color: white ; background-color: #196297; font-size: 25px;')
+        self.info_button.setStyleSheet('color: white; background-color: #196297; font-size: 25px;')
         self.info_button.setToolTip('About the App')
         self.info_button.clicked.connect(self.show_info)
 
         # Log In Button
         self.login_button = QPushButton("Log In", self)
         self.login_button.setGeometry(720, 290, 100, 50)
-        self.login_button.setStyleSheet('color: white ; background-color: #196297; font-size: 25px;')
+        self.login_button.setStyleSheet('color: white; background-color: #196297; font-size: 25px;')
         self.login_button.setToolTip('Login to your account')
         self.login_button.clicked.connect(self.open_login)
 
         # Sign Up Button
         self.signup_button = QPushButton("Sign Up", self)
         self.signup_button.setGeometry(830, 290, 100, 50)
-        self.signup_button.setStyleSheet('color: white ; background-color: #196297; font-size: 25px;')
+        self.signup_button.setStyleSheet('color: white; background-color: #196297; font-size: 25px;')
         self.signup_button.setToolTip('Create a new account')
         self.signup_button.clicked.connect(self.open_signup)
 
         # Employee Login Button
         self.emplog_button = QPushButton("EmpLog", self)
         self.emplog_button.setGeometry(650, 355, 100, 50)
-        self.emplog_button.setStyleSheet('color: white ; background-color: #196297; font-size: 25px;')
+        self.emplog_button.setStyleSheet('color: white; background-color: #196297; font-size: 25px;')
         self.emplog_button.setToolTip('Employee Login')
         self.emplog_button.clicked.connect(self.open_emplog)
 
         # Exit Button
         self.exit_button = QPushButton("Exit", self)
         self.exit_button.setGeometry(780, 355, 100, 50)
-        self.exit_button.setStyleSheet('color: white ; background-color: #196297; font-size: 25px;')
+        self.exit_button.setStyleSheet('color: white; background-color: #196297; font-size: 25px;')
         self.exit_button.setToolTip('Exit the app')
         self.exit_button.clicked.connect(QtWidgets.qApp.quit)
 
@@ -107,7 +108,11 @@ class WelcomeWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+
+    # ✅ إنشاء الجداول الأساسية + جدول الموظفين + حساب admin
     create_tables()
+    create_employee_table()
+
     welcome = WelcomeWindow()
     welcome.show()
     sys.exit(app.exec_())

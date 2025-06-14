@@ -77,7 +77,7 @@ class CleaningBillPanel(QWidget):
         self.amount_input.clear()
 
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     app = QApplication(sys.argv)
     window = CleaningBillPanel()
     window.show()

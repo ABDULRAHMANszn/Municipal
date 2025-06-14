@@ -75,7 +75,7 @@ class GasBillPanel(QWidget):
         self.add_button = QPushButton("Add Bill", self)
         self.add_button.setGeometry(170, 500, 150, 50)
         self.add_button.setFont(QFont("Segoe UI", 14))
-        self.add_button.setStyleSheet("background-color: #27ae60; color: white; font-weight: bold;")
+        self.add_button.setStyleSheet("background-color: #196297; color: white; font-weight: bold;")
         self.add_button.clicked.connect(self.add_bill)
 
     def calculate_gas_bill(self, consumption, frate, arate):

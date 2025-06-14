@@ -4,7 +4,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt
+
 from db_manager import create_employee_table, check_employee_credentials
+from employee.dashboard_emp import Dashboard
 
 
 class LogInWindow(QMainWindow):
@@ -66,12 +68,18 @@ class LogInWindow(QMainWindow):
 
         if check_employee_credentials(username, password):
             QMessageBox.information(self, "Login Successful", f"Welcome, {username}!")
+
+            # ✅ فتح لوحة تحكم الموظف وتمرير اسم المستخدم
+            self.dashboard = Dashboard(username)
+            self.dashboard.show()
+            self.close()
+
         else:
             QMessageBox.critical(self, "Login Failed", "Invalid username or password.")
 
 
 if __name__ == "__main__":
-    create_employee_table()
+    create_employee_table()  # ✅ إنشاء جدول الموظف وإضافة admin إن لم يكن موجود
     app = QApplication(sys.argv)
     window = LogInWindow()
     window.show()

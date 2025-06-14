@@ -5,12 +5,12 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
 from functools import partial
 
-from kinan_manager import get_all_users, update_user, delete_user_by_id
+from db_manager import get_all_users, update_user, delete_user_by_id
 
 
 class ManageUsers(QWidget):
-    def _init_(self):
-        super()._init_()
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("Manage Users")
         self.setGeometry(100, 100, 1100, 840)
         self.setFixedSize(894, 700)
@@ -83,7 +83,7 @@ class ManageUsers(QWidget):
             delete_user_by_id(user_id)
             QMessageBox.information(self, "Deleted", "User deleted.")
             self.load_users()
-if _name_ == "_main_":
+if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
     import sys
 

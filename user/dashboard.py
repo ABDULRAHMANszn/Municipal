@@ -249,6 +249,6 @@ if __name__ == "__main__":
     create_tables()
 
     app = QApplication(sys.argv)
-    window = Dashboard("abood")
+    window = Dashboard("user")
     window.show()
     sys.exit(app.exec_())

@@ -531,3 +531,72 @@ def check_employee_credentials(username, password):
         return False
     finally:
         conn.close()
+
+
+def get_all_users():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT id, username, name, surname, password FROM users")
+    users = c.fetchall()
+    conn.close()
+    return users
+
+
+def update_user(user_id, name, surname, password):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        UPDATE users
+        SET name = ?, surname = ?, password = ?
+        WHERE id = ?
+    """, (name, surname, password, user_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_user_by_id(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+def get_all_user_requests_info():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, username FROM users")
+    users = cursor.fetchall()
+
+    result = []
+
+    for user_id, username in users:
+        # complaint
+        cursor.execute("SELECT description FROM complaints WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        complaint = cursor.fetchone()
+        complaint_text = complaint[0] if complaint else ""
+
+        # request
+        cursor.execute("SELECT description, status, id FROM requests WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        request = cursor.fetchone()
+        request_text = request[0] if request else ""
+        request_status = request[1] if request else "Pending"
+        request_id = request[2] if request else None
+
+        # suggestion
+        cursor.execute("SELECT suggestion FROM suggestions WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        suggestion = cursor.fetchone()
+        suggestion_text = suggestion[0] if suggestion else ""
+
+        result.append((username, complaint_text, request_text, suggestion_text, request_id, request_status))
+
+    conn.close()
+    return result
+
+
+def update_request_status(request_id, new_status):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE requests SET status = ? WHERE id = ?", (new_status, request_id))
+    conn.commit()
+    conn.close()

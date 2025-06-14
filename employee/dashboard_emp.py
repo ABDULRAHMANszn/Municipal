@@ -1,17 +1,16 @@
+# dashboard_emp.py
+
+import sys
 from PyQt5.QtWidgets import (
-    QWidget, QLabel, QLineEdit, QComboBox, QTextEdit, QSpinBox,
-    QFrame, QPushButton, QVBoxLayout, QMainWindow, QStackedWidget, QCheckBox, QApplication
+    QWidget, QLabel, QPushButton, QMainWindow, QStackedWidget,
+    QFrame, QApplication, QMessageBox
 )
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtCore import Qt, QSize
-from user.complainment import Complainment
-from user.suggestion import Suggestion
-from user.service import Service
-from profile import Profile
-import sys
-from db_manager import *
-from all_users import ManageUsers
 
+from db_manager import create_tables
+from employee.all_users import ManageUsers
+from employee.ManageRequests import ManageRequests
 
 
 class Main(QWidget):
@@ -19,19 +18,27 @@ class Main(QWidget):
         super().__init__()
         self.username = username
 
+        from bills_admin.water import AdminPanel as WaterForm
+        from bills_admin.electric import AdminPanel as ElectricForm
+        from bills_admin.gas import GasBillPanel as GasForm
+        from bills_admin.cleaning import CleaningBillPanel as CleaningForm
+
+
+        self.water_form = WaterForm()
+        self.electric_form = ElectricForm()
+        self.gas_form = GasForm()
+        self.clean_form = CleaningForm()
+
         self.subl = QLabel("Subscriptions", self)
         self.subl.setFont(QFont("Segoe UI", 25, QFont.Bold))
         self.subl.setAlignment(Qt.AlignCenter)
         self.subl.setGeometry(320, 45, 300, 60)
         self.subl.setStyleSheet("color: #1E2A38;")
 
-
-
         self.create_fun_card(90, 130, "../images/Su.jpeg", "Water Subscription", "Add Bill", self.show_water_form)
         self.create_fun_card(340, 130, "../images/elec.jpg", "Electricity Subscription", "Add Bill", self.show_electricity_form)
         self.create_fun_card(590, 130, "../images/clean.jpg", "Cleaning Subscription", "Add Bill", self.show_cleaning_form)
         self.create_fun_card(340, 420, "../images/gas.jpg", "Gas Subscription", "Add Bill", self.show_gas_form)
-
 
     def create_fun_card(self, x, y, image_path, title_text, button_text, button_action=None):
         card = QFrame(self)
@@ -75,24 +82,16 @@ class Main(QWidget):
             button.clicked.connect(button_action)
 
     def show_water_form(self):
-        self.water_form.raise_()
-        self.water_form.setVisible(True)
+        self.water_form.show()
 
     def show_electricity_form(self):
-        self.electricity_form.raise_()
-        self.electricity_form.setVisible(True)
+        self.electric_form.show()
 
     def show_cleaning_form(self):
-        self.cleaning_form.raise_()
-        self.cleaning_form.setVisible(True)
+        self.clean_form.show()
 
     def show_gas_form(self):
-        self.gas_form.raise_()
-        self.gas_form.setVisible(True)
-
-    def show_visa_form(self):
-        self.visa_form.raise_()
-        self.visa_form.setVisible(True)
+        self.gas_form.show()
 
 
 class Dashboard(QMainWindow):
@@ -157,36 +156,15 @@ class Dashboard(QMainWindow):
         self.btn_Subsc.setGeometry(0, 300, 350, 50)
         self.btn_Subsc.setCheckable(True)
         self.btn_Subsc.setStyleSheet(button_style)
-        self.btn_Subsc.setIcon(QIcon("../images/m.png"))
+        self.btn_Subsc.setIcon(QIcon("../images/pro.png"))
         self.btn_Subsc.setIconSize(QSize(22, 22))
 
-        self.btn_service = QPushButton(" Service Request", self.left_frame)
+        self.btn_service = QPushButton(" Users Activities", self.left_frame)
         self.btn_service.setGeometry(0, 350, 350, 50)
         self.btn_service.setCheckable(True)
         self.btn_service.setStyleSheet(button_style)
-        self.btn_service.setIcon(QIcon("../images/ser.png"))
+        self.btn_service.setIcon(QIcon("../images/m.png"))
         self.btn_service.setIconSize(QSize(22, 22))
-
-        self.btn_complaint = QPushButton(" Complaint", self.left_frame)
-        self.btn_complaint.setGeometry(0, 400, 350, 50)
-        self.btn_complaint.setCheckable(True)
-        self.btn_complaint.setStyleSheet(button_style)
-        self.btn_complaint.setIcon(QIcon("../images/cons.png"))
-        self.btn_complaint.setIconSize(QSize(22, 22))
-
-        self.btn_suggestion = QPushButton(" Suggestion", self.left_frame)
-        self.btn_suggestion.setGeometry(0, 450, 350, 50)
-        self.btn_suggestion.setCheckable(True)
-        self.btn_suggestion.setStyleSheet(button_style)
-        self.btn_suggestion.setIcon(QIcon("../images/suggestion.png"))
-        self.btn_suggestion.setIconSize(QSize(22, 22))
-
-        self.btn_profile = QPushButton(" Profile", self.left_frame)
-        self.btn_profile.setGeometry(0, 500, 350, 50)
-        self.btn_profile.setCheckable(True)
-        self.btn_profile.setStyleSheet(button_style)
-        self.btn_profile.setIcon(QIcon("../images/pro.png"))
-        self.btn_profile.setIconSize(QSize(22, 22))
 
         self.btn_signout = QPushButton(" Sign out", self.left_frame)
         self.btn_signout.setGeometry(0, 600, 350, 50)
@@ -196,7 +174,7 @@ class Dashboard(QMainWindow):
         self.btn_signout.setIconSize(QSize(22, 22))
 
         def open_welcome():
-            from welcome import WelcomeWindow
+            from user.welcome import WelcomeWindow
             self.welcome_window = WelcomeWindow()
             self.welcome_window.show()
             self.close()
@@ -208,17 +186,11 @@ class Dashboard(QMainWindow):
 
         self.page_main = Main(self.username)
         self.page_subs = ManageUsers()
-        self.page_service = Service(self.username)
-        self.page_complaint = Complainment(self.username)
-        self.page_suggestion = Suggestion(self.username)
-        self.page_profile = Profile(self.username)
+        self.page_service = ManageRequests()
 
         self.stack.addWidget(self.page_main)
         self.stack.addWidget(self.page_subs)
         self.stack.addWidget(self.page_service)
-        self.stack.addWidget(self.page_complaint)
-        self.stack.addWidget(self.page_suggestion)
-        self.stack.addWidget(self.page_profile)
 
         self.setup_button()
 
@@ -226,25 +198,17 @@ class Dashboard(QMainWindow):
         self.btn_main.clicked.connect(lambda: self.switch_page(0, self.btn_main))
         self.btn_Subsc.clicked.connect(lambda: self.switch_page(1, self.btn_Subsc))
         self.btn_service.clicked.connect(lambda: self.switch_page(2, self.btn_service))
-        self.btn_complaint.clicked.connect(lambda: self.switch_page(3, self.btn_complaint))
-        self.btn_suggestion.clicked.connect(lambda: self.switch_page(4, self.btn_suggestion))
-        self.btn_profile.clicked.connect(lambda: self.switch_page(5, self.btn_profile))
-
         self.switch_page(0, self.btn_main)
 
     def switch_page(self, index, active_button):
         self.stack.setCurrentIndex(index)
-        for btn in [
-            self.btn_main, self.btn_Subsc, self.btn_service,
-            self.btn_complaint, self.btn_suggestion, self.btn_profile,
-        ]:
+        for btn in [self.btn_main, self.btn_Subsc, self.btn_service]:
             btn.setChecked(btn == active_button)
 
 
 if __name__ == "__main__":
     create_tables()
-
     app = QApplication(sys.argv)
-    window = Dashboard("abood")
+    window = Dashboard("user")
     window.show()
     sys.exit(app.exec_())
