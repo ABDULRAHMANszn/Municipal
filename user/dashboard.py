@@ -11,6 +11,7 @@ from profile import Profile
 import sys
 from db_manager import *
 from subsucribtion_panels import *
+from my_sub import UserSubscriptions
 
 
 class Main(QWidget):
@@ -24,18 +25,20 @@ class Main(QWidget):
         self.subl.setGeometry(320, 45, 300, 60)
         self.subl.setStyleSheet("color: #1E2A38;")
 
+        self.subscription_window = UserSubscriptions(self.username)
+
         self.water_form = WaterSubscriptionForm(self.username)
-        self.electricity_form = ElectricitySubscriptionForm(self.username)
-        self.cleaning_form = CleaningSubscriptionForm(self.username)
-        self.gas_form = GasSubscriptionForm(self.username)
-        self.visa_form = VisaDigitalForm(self.username)
+        self.electricity_form = ElectricitySubscriptionForm(self.username, self.subscription_window)
+        self.cleaning_form = CleaningSubscriptionForm(self.username, self.subscription_window)
+        self.gas_form = GasSubscriptionForm(self.username, self.subscription_window)
+        self.visa_form = VisaDigitalForm(self.username, self.subscription_window)
 
         self.create_fun_card(90, 130, "../images/Su.jpeg", "Water Subscription", "Subscribe", self.show_water_form)
         self.create_fun_card(340, 130, "../images/elec.jpg", "Electricity Subscription", "Subscribe", self.show_electricity_form)
         self.create_fun_card(590, 130, "../images/clean.jpg", "Cleaning Subscription", "Subscribe", self.show_cleaning_form)
         self.create_fun_card(90, 420, "../images/gas.jpg", "Gas Subscription", "Subscribe", self.show_gas_form)
         self.create_fun_card(340, 420, "../images/visa.jpg", "Visa Digital", "Subscribe", self.show_visa_form)
-        self.create_fun_card(590, 420, "../images/statf.jpeg", "Staff", "View")
+        self.create_fun_card(590, 420, "../images/statf.jpeg", "Staff", "View",self.view)
 
     def create_fun_card(self, x, y, image_path, title_text, button_text, button_action=None):
         card = QFrame(self)
@@ -97,6 +100,14 @@ class Main(QWidget):
     def show_visa_form(self):
         self.visa_form.raise_()
         self.visa_form.setVisible(True)
+
+    def view(self):
+        information = '''
+                <h2 style="color:#196297; text-align:center;">The Staff</h2>
+                <p style="font-size:14px; color:#333333; text-align:justify;">
+        The individuals who completed this project are Saed O. S. Radi, Abdulrahman Zeineddin, and Kinan Al-Imam. </p>'''
+
+        QMessageBox.about(self, "Municipal Services Tracking", information)
 
 
 class Dashboard(QMainWindow):
@@ -211,7 +222,10 @@ class Dashboard(QMainWindow):
         self.stack.setGeometry(0, 0, 894, 700)
 
         self.page_main = Main(self.username)
-        self.page_subs = Main(self.username)
+        self.page_subs = UserSubscriptions(self.username)
+        self.page_subs.table.clear()
+
+        self.page_subs.load_data()
         self.page_service = Service(self.username)
         self.page_complaint = Complainment(self.username)
         self.page_suggestion = Suggestion(self.username)
@@ -247,8 +261,7 @@ class Dashboard(QMainWindow):
 
 if __name__ == "__main__":
     create_tables()
-
     app = QApplication(sys.argv)
-    window = Dashboard("user")
+    window = Dashboard("abood")
     window.show()
     sys.exit(app.exec_())
