@@ -18,6 +18,3 @@ data.db
 *.sqlite
 # تجاهل ملفات النظام
 *.DS_Store
-
-# تجاهل ملفات معينة
-images/con.png
