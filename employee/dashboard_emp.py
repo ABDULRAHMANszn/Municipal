@@ -5,17 +5,18 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtCore import Qt, QSize
 from user.complainment import Complainment
-from suggestion import Suggestion
+from user.suggestion import Suggestion
 from user.service import Service
 from profile import Profile
 import sys
 from db_manager import *
+from all_users import ManageUsers
 
 
 
 class Main(QWidget):
-    def _init_(self, username):
-        super()._init_()
+    def __init__(self, username):
+        super().__init__()
         self.username = username
 
         self.subl = QLabel("Subscriptions", self)
@@ -95,8 +96,8 @@ class Main(QWidget):
 
 
 class Dashboard(QMainWindow):
-    def _init_(self, username):
-        super()._init_()
+    def __init__(self, username):
+        super().__init__()
         self.username = username
 
         self.setFixedSize(1244, 700)
@@ -170,7 +171,7 @@ class Dashboard(QMainWindow):
         self.btn_complaint.setGeometry(0, 400, 350, 50)
         self.btn_complaint.setCheckable(True)
         self.btn_complaint.setStyleSheet(button_style)
-        self.btn_complaint.setIcon(QIcon("../images/con.png"))
+        self.btn_complaint.setIcon(QIcon("../images/cons.png"))
         self.btn_complaint.setIconSize(QSize(22, 22))
 
         self.btn_suggestion = QPushButton(" Suggestion", self.left_frame)
@@ -206,7 +207,7 @@ class Dashboard(QMainWindow):
         self.stack.setGeometry(0, 0, 894, 700)
 
         self.page_main = Main(self.username)
-        self.page_subs = Main(self.username)
+        self.page_subs = ManageUsers()
         self.page_service = Service(self.username)
         self.page_complaint = Complainment(self.username)
         self.page_suggestion = Suggestion(self.username)
@@ -240,7 +241,7 @@ class Dashboard(QMainWindow):
             btn.setChecked(btn == active_button)
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     create_tables()
 
     app = QApplication(sys.argv)
