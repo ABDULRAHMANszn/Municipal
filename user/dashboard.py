@@ -199,6 +199,14 @@ class Dashboard(QMainWindow):
         self.btn_signout.setIcon(QIcon("../images/out.png"))
         self.btn_signout.setIconSize(QSize(22, 22))
 
+        def open_welcome():
+            from welcome import WelcomeWindow
+            self.welcome_window = WelcomeWindow()
+            self.welcome_window.show()
+            self.close()
+
+        self.btn_signout.clicked.connect(open_welcome)
+
         self.stack = QStackedWidget(self.right_frame)
         self.stack.setGeometry(0, 0, 894, 700)
 

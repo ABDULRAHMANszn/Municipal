@@ -1,6 +1,6 @@
 import sqlite3
 import os
-BASE_DIR = os.path.dirname(os.path.abspath(_file_))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "data.db")
 
 
@@ -423,7 +423,7 @@ def create_default_bills_for_new_user(conn, user_id):
 
 
 def create_employee_table():
-    conn = sqlite3.connect("data.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS employee (
@@ -439,57 +439,10 @@ def create_employee_table():
     conn.commit()
     conn.close()
 
-def create_requests_table():
-    conn = sqlite3.connect("data.db")
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS requests (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            service_type TEXT NOT NULL,
-            description TEXT NOT NULL,
-            address TEXT NOT NULL,
-            image_path TEXT,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
-    conn.commit()
-    conn.close()
 
 
-def create_complaints_table():
-    conn = sqlite3.connect("data.db")
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS complaints (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            title TEXT NOT NULL,
-            contact TEXT NOT NULL,
-            description TEXT NOT NULL,
-            complaint_type TEXT NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
-    conn.commit()
-    conn.close()
 
-def create_suggestions_table():
-    conn = sqlite3.connect("data.db")
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS suggestions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            suggestion TEXT NOT NULL,
-            category TEXT NOT NULL,
-            proposed_solution TEXT,
-            placeholder TEXT,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    """)
-    conn.commit()
-    conn.close()
+
 
 
 
@@ -499,13 +452,7 @@ def register_user(username, name, surname, password, confirm_password):
 
     conn = None
     try:
-        create_tables()
-        create_employee_table()
-        create_requests_table()
-        create_complaints_table()
-        create_suggestions_table()
-
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
         c.execute("SELECT * FROM users WHERE username = ?", (username,))
@@ -523,8 +470,6 @@ def register_user(username, name, surname, password, confirm_password):
         if result is None:
             return "Error: Could not retrieve user ID."
         user_id = result[0]
-
-        create_default_bills_for_new_user(conn, user_id)
 
         return "Registered successfully!"
 
@@ -555,7 +500,7 @@ def create_default_bills_for_new_user(conn, user_id):
 
 def check_credentials(username, password):
     try:
-        conn = sqlite3.connect("data.db")
+        conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
         c.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
@@ -567,5 +512,18 @@ def check_credentials(username, password):
         print("Database error:", e)
         return False
 
+    finally:
+        conn.close()
+
+
+def check_employee_credentials(username, password):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT * FROM employee WHERE username = ? AND password = ?", (username, password))
+        return bool(c.fetchone())
+    except sqlite3.Error as e:
+        print("Database error:", e)
+        return False
     finally:
         conn.close()
